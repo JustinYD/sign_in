@@ -1,49 +1,24 @@
 <template>
-  <div v-if="show">
-    <van-dialog
-      id="van-dialog"
-    />
-    <van-dialog
-      id="van-dialog"
-    />
-    <van-toast
-      id="van-toast" />
-    <van-empty
-      description="未添加任何课程"
-    >
-      <van-button
-        type="danger"
-        @click="test"
-        class="bottom-button"
-      >
-        {{motto}}
-      </van-button>
-    </van-empty>
-  </div>
-  <div v-else>
-    无
-    <van-button @click="test1">老师</van-button>
+  <div>
+    {{motto}}
+    <van-button
+      @click="test"
+      type="default"
+    >默认按钮
+    </van-button>
   </div>
 </template>
 
 <script>
-import store from '../../utils/store'
-import Dialog from '../../../static/vant/dialog/dialog'
-import Toast from '../../../static/vant/toast/toast';
 export default {
   data () {
     return {
       motto: 'Hello miniprograme',
-      address: {},
-      show: true
+      address: {}
     }
   },
 
   methods: {
-    onClose() {
-      this.show = false
-      console.log('关闭')
-    },
     getLocation () {
       var that = this
       wx.getSetting({
@@ -72,49 +47,19 @@ export default {
           }
         })
     },
-    test1(){
-      mpvue.navigateTo({url: '../role/main'})
-    },
     test () {
       var that = this
-      Dialog.alert({
-        message: '地址信息',
-        showCancelButton: true
-      }).then(() => {
-        that.$http.get({
-            url:"/getlw_10"
-        }).then(res =>{
-            console.log(res)
-        })
-      }).catch(() => {
-        console.log('no')
-      })
-    },
-    clickHandle (ev) {
-      this.motto = 'fuck!!!!'
+      this.getLocation()
     }
   },
+
   created () {
-    var that = this
-    var role = store.state.role
-    if (role === '') {
-      this.show = false
-      console.log('无')
-    } else {
-      this.show = true
-      console.log('有')
-    }
-    this.getLocation()
-    this.motto = store.state.msg
+    
   }
 }
 </script>
 
 <style scoped>
-.bottom-button {
-  width: 260px;
-  height: 40px;
-}
 .userinfo {
   display: flex;
   flex-direction: column;

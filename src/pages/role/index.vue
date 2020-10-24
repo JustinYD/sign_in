@@ -1,28 +1,6 @@
 <template>
-  <div v-if="show">
-    <van-dialog
-      id="van-dialog"
-    />
-    <van-dialog
-      id="van-dialog"
-    />
-    <van-toast
-      id="van-toast" />
-    <van-empty
-      description="未添加任何课程"
-    >
-      <van-button
-        type="danger"
-        @click="test"
-        class="bottom-button"
-      >
-        {{motto}}
-      </van-button>
-    </van-empty>
-  </div>
-  <div v-else>
-    无
-    <van-button @click="test1">老师</van-button>
+  <div>
+    xxxx
   </div>
 </template>
 
@@ -73,7 +51,7 @@ export default {
         })
     },
     test1(){
-      mpvue.navigateTo({url: '../role/main'})
+      this.show=true
     },
     test () {
       var that = this
