@@ -1,13 +1,35 @@
 <template>
-  <div>
-    xxxx
+  <div >
+    <div  class="stuOrTea">
+      <van-row>
+      <van-col span="12">
+        <van-empty
+          class="custom-image"
+          image="/static/images/teacher.png"
+        >
+          <van-button plain type="info" open-type='getUserInfo' @click="register('teacher')">
+            我是老师
+          </van-button>
+        </van-empty>
+      </van-col>
+      <van-col span="12">
+        <van-empty
+          class="custom-image"
+          image="/static/images/student.png"
+        >
+          <van-button plain type="info" open-type='getUserInfo' @click="register('student')">
+            我是学生
+          </van-button>
+        </van-empty>
+      </van-col>
+    </van-row>
+    </div>
+    
   </div>
 </template>
 
 <script>
 import store from '../../utils/store'
-import Dialog from '../../../static/vant/dialog/dialog'
-import Toast from '../../../static/vant/toast/toast';
 export default {
   data () {
     return {
@@ -18,40 +40,71 @@ export default {
   },
 
   methods: {
-    onClose() {
-      this.show = false
-      console.log('关闭')
+    isLogin(role){	
+      wx.showLoading({
+        title: '加载中...' 
+      })	
+			var _this=this;
+	        wx.getSetting({
+	          success(res) {    	          	 
+	            if (!res.authSetting['scope.userInfo']) {//未授权getUserInfo            	
+	              wx.authorize({
+	                scope: 'scope.getUserInfo',
+	                success(res) {	                
+	                  _this.getOpenId(role)
+	                },
+	                fail(err){
+                   console.log(err)
+                   wx.hideLoading()
+	                }
+	              })
+	            }else{//已授权
+	              wx.getUserInfo({
+	                success(res) {	
+	                	_this.getOpenId(role)
+	                },
+	                fail(err) {
+                    console.log(err)
+                    wx.hideLoading()
+	                }
+	              })
+	            }
+	          }
+	        })
+	    },
+    getOpenId(role){  //获取用户的openid
+			let _this=this
+			wx.login({
+			  success(res) {
+			  	  	if (res.code) {
+				      // 发起网络请求
+				      wx.request({
+				        url: 'https://api.weixin.qq.com/sns/jscode2session',
+				        data: {
+				            appid:'wx94de1f8bea88c043',  //开发者appid
+				            secret:'a2050000a960ee55972f64eec7e4cfbd', //开发者AppSecret(小程序密钥)	
+				            grant_type:"authorization_code",  //默认authorization_code
+				            js_code: res.code    //wx.login登录获取的code值
+				        },
+				        success(res) {
+                  store.commit('changeOpenid', res.data.openid)
+                  wx.hideLoading()			   
+						}
+				      })
+				    } else {
+				      console.log('登录失败！' + res.errMsg)
+				    }
+			  }
+      })
+		},
+    routeHome(){
+      wx.switchTab({url: '../index/main'})
     },
-    getLocation () {
-      var that = this
-      wx.getSetting({
-          success: function(e) {
-            let userLocation = e.authSetting["scope.userLocation"]
-            if(typeof(userLocation)=="undefined"){  // 用户第一次授权地理位置
-                //1、获取当前位置坐标
-              wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                  //2、根据坐标获取当前位置名称，显示在顶部:逆地址解析
-                  that.address.lat = res.latitude
-                  that.address.lon = res.longitude
-                }
-              })
-            }else{  // 用户点了允许授权之后 又设置不允许获取位置的处理
-              wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                  //2、根据坐标获取当前位置名称，显示在顶部:逆地址解析
-                  that.address.lat = res.latitude
-                  that.address.lon = res.longitude
-                }
-              })
-            }
-          }
-        })
-    },
-    test1(){
-      this.show=true
+    register(role){
+      this.isLogin()
+      store.commit('changeStu', role)
+      mpvue.navigateTo({url: '../register/main'})
+      // console.log(store.state.role)
     },
     test () {
       var that = this
@@ -67,22 +120,21 @@ export default {
       }).catch(() => {
         console.log('no')
       })
-    },
-    clickHandle (ev) {
-      this.motto = 'fuck!!!!'
     }
   },
-  created () {
+  onShow () {
     var that = this
     var role = store.state.role
-    if (role === '') {
-      this.show = false
-      console.log('无')
-    } else {
-      this.show = true
-      console.log('有')
+    if (role.role == '') {
+      wx.showToast({
+        title: '请登录',
+        image: '/static/images/error.png',
+        duration: 2000
+      })
     }
-    this.getLocation()
+    // } else {
+    //   wx.switchTab({url: '../../pages/index/main'})
+    // }
     this.motto = store.state.msg
   }
 }
@@ -93,54 +145,7 @@ export default {
   width: 260px;
   height: 40px;
 }
-.userinfo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
-
-.userinfo-nickname {
-  color: #aaa;
-}
-
-.usermotto {
-  margin-top: 150px;
-}
-
-.form-control {
-  display: block;
-  padding: 0 12px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-}
-.all {
-  width: 7.5rem;
-  height: 1rem;
-  background-color: blue;
-}
-.all:after {
-  display: block;
-  content: '';
-  clear: both;
-}
-.left {
-  float: left;
-  width: 3rem;
-  height: 1rem;
-  background-color: red;
-}
-
-.right {
-  float: left;
-  width: 4.5rem;
-  height: 1rem;
-  background-color: green;
+.stuOrTea{
+  margin-top:50%
 }
 </style>

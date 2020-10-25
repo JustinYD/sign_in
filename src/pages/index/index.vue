@@ -1,11 +1,10 @@
 <template>
-  <div v-if="show">
+  <div>
+    <div v-if="show">
     <van-dialog
       id="van-dialog"
     />
-    <van-dialog
-      id="van-dialog"
-    />
+
     <van-toast
       id="van-toast" />
     <van-empty
@@ -21,9 +20,27 @@
     </van-empty>
   </div>
   <div v-else>
-    无
-    <van-button @click="test1">老师</van-button>
+    <van-cell-group>
+      <van-cell
+        title="单元格"
+        value="内容"
+        @click="test1"
+      />
+      <van-cell
+        title="单元格"
+        value="内容"
+      />
+      <van-cell
+        title="单元格"
+        value="内容"
+      />
+    </van-cell-group>
+    <van-dialog
+      id="van-dialog"
+    />
   </div>
+  </div>
+  
 </template>
 
 <script>
@@ -35,7 +52,9 @@ export default {
     return {
       motto: 'Hello miniprograme',
       address: {},
-      show: true
+      show: true,
+      right_width: 65,
+      left_width: 65
     }
   },
 
@@ -73,7 +92,7 @@ export default {
         })
     },
     test1(){
-      mpvue.navigateTo({url: '../role/main'})
+      wx.redirectTo({url: '../role/main'})
     },
     test () {
       var that = this
@@ -81,28 +100,28 @@ export default {
         message: '地址信息',
         showCancelButton: true
       }).then(() => {
-        that.$http.get({
-            url:"/getlw_10"
-        }).then(res =>{
-            console.log(res)
-        })
+        // that.$http.get({
+        //     url:"/getlw_10"
+        // }).then(res =>{
+        //     console.log(res)
+        // })
+        console.log(this.address)
       }).catch(() => {
-        console.log('no')
+        mpvue.redirectTo({url:'../role/main'})
       })
     },
     clickHandle (ev) {
       this.motto = 'fuck!!!!'
     }
   },
-  created () {
+  onShow () {
     var that = this
     var role = store.state.role
-    if (role === '') {
+    console.log(role)
+    if (role.role == 'teacher') {
       this.show = false
-      console.log('无')
     } else {
       this.show = true
-      console.log('有')
     }
     this.getLocation()
     this.motto = store.state.msg
