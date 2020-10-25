@@ -1,4 +1,4 @@
-const host = 'https://api.smartdk.top';
+const host = 'http://127.0.0.1:5000';
 
 function request(url, method, data, header = {}) {
     wx.showLoading({

@@ -107,19 +107,7 @@ export default {
       // console.log(store.state.role)
     },
     test () {
-      var that = this
-      Dialog.alert({
-        message: '地址信息',
-        showCancelButton: true
-      }).then(() => {
-        that.$http.get({
-            url:"/getlw_10"
-        }).then(res =>{
-            console.log(res)
-        })
-      }).catch(() => {
-        console.log('no')
-      })
+      
     }
   },
   onShow () {

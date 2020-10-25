@@ -145,9 +145,33 @@ export default {
         sex: this.sex,
         role:this.role.role
       }
-      store.commit('changeRole', data)
-      console.log(data)
-      mpvue.switchTab({url:'/pages/index/main'})
+      this.$http.post({
+            url:"/regStu",
+            data:data
+        }).then(res =>{
+            console.log(res)
+            if (res.status == 200) {
+              store.commit('changeRole', data)
+              wx.showToast({
+                title: '注册成功', //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+                // success: res => {
+                //   mpvue.switchTab({url:'/pages/index/main'})
+                // }
+              });
+            } else {
+              wx.showToast({
+                title: '注册失败', //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+                mask: true
+              });
+            }
+            
+        })
+      
     },
     submitTea(){
       var data={
@@ -156,9 +180,32 @@ export default {
         tel:this.tel,
         role:this.role.role
       }
-      store.commit('changeRole', data)
-      console.log(data)
-      mpvue.switchTab({url:'/pages/index/main'})
+      this.$http.post({
+            url:"/regTea",
+            data:data
+        }).then(res =>{
+            console.log(res)
+            if (res.status == 200) {
+              store.commit('changeRole', data)
+              wx.showToast({
+                title: '注册成功', //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+                // success: res => {
+                //   mpvue.switchTab({url:'/pages/index/main'})
+                // }
+              });
+            } else {
+              wx.showToast({
+                title: '注册失败', //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+                mask: true
+              });
+            }
+            
+        })
     },
     test1(){
       console.log(this.name,this.stuNum,this.className)

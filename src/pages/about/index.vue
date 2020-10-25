@@ -1,7 +1,6 @@
 <template>
   <div>
     <div v-for="item in testData" :key="item">
-      {{item.name}}
     </div>
     <van-cell
       is-link
