@@ -1,20 +1,45 @@
 <template>
   <div>
-    {{motto}}
-    <van-button
-      @click="test"
-      type="default"
-    >默认按钮
-    </van-button>
+    <div v-for="item in testData" :key="item">
+      {{item.name}}
+    </div>
+    <van-cell
+      is-link
+      title="个人信息"
+      icon="manager-o"
+      link-type="navigateTo"
+      url="../myself/main"
+    />
+    <van-cell
+      is-link
+      title="我的课程"
+      icon="star-o"
+      link-type="navigateTo"
+      url="../role/main"
+    />
+    <van-cell
+      is-link
+      title="我的考勤"
+      icon="clock-o"
+      link-type="navigateTo"
+      url="../role/main"
+    />
   </div>
 </template>
 
 <script>
+import store from '../../utils/store'
 export default {
   data () {
     return {
       motto: 'Hello miniprograme',
-      address: {}
+      address: {},
+      testData:[{
+        name:'sdsd'
+      },
+      {
+        name:'啊啊啊啊'
+      }]
     }
   },
 
@@ -53,8 +78,9 @@ export default {
     }
   },
 
-  created () {
-    
+  onShow(){
+    this.role=store.state.role
+    console.log(this.role)
   }
 }
 </script>

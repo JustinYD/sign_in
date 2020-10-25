@@ -1,29 +1,6 @@
 <template>
   <div >
-    <div  class="stuOrTea">
-      <van-row>
-      <van-col span="12">
-        <van-empty
-          class="custom-image"
-          image="/static/images/teacher.png"
-        >
-          <van-button plain type="info" open-type='getUserInfo' @click="register('teacher')">
-            我是老师
-          </van-button>
-        </van-empty>
-      </van-col>
-      <van-col span="12">
-        <van-empty
-          class="custom-image"
-          image="/static/images/student.png"
-        >
-          <van-button plain type="info" open-type='getUserInfo' @click="register('student')">
-            我是学生
-          </van-button>
-        </van-empty>
-      </van-col>
-    </van-row>
-    </div>
+    个人信息
     
   </div>
 </template>
@@ -35,7 +12,8 @@ export default {
     return {
       motto: 'Hello miniprograme',
       address: {},
-      show: true
+      show: true,
+      role:{}
     }
   },
 
@@ -125,16 +103,7 @@ export default {
   onShow () {
     var that = this
     var role = store.state.role
-    if (role.role == '') {
-      wx.showToast({
-        title: '请登录',
-        image: '/static/images/error.png',
-        duration: 2000
-      })
-    } else {
-      wx.switchTab({url: '../../pages/index/main'})
-    }
-    this.motto = store.state.msg
+    this.role=role
   }
 }
 </script>

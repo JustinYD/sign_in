@@ -3,7 +3,8 @@
         "pages/role/main",
         "pages/index/main",
         "pages/about/main",
-        "pages/register/main"
+        "pages/register/main",
+        "pages/myself/main"
     ],
     "window": {
         "backgroundTextStyle": "light",

@@ -145,7 +145,9 @@ export default {
         sex: this.sex,
         role:this.role.role
       }
+      store.commit('changeRole', data)
       console.log(data)
+      mpvue.switchTab({url:'/pages/index/main'})
     },
     submitTea(){
       var data={
@@ -154,7 +156,9 @@ export default {
         tel:this.tel,
         role:this.role.role
       }
+      store.commit('changeRole', data)
       console.log(data)
+      mpvue.switchTab({url:'/pages/index/main'})
     },
     test1(){
       console.log(this.name,this.stuNum,this.className)
