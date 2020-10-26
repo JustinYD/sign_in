@@ -1,4 +1,4 @@
-const host = 'http://127.0.0.1:5000';
+const host = 'http://192.168.0.115:5000';
 
 function request(url, method, data, header = {}) {
     wx.showLoading({
@@ -18,6 +18,12 @@ function request(url, method, data, header = {}) {
             },
             fail: function(error) {
                 wx.hideLoading();
+                wx.showToast({
+                    title: '服务器连接失败', //提示的内容,
+                    icon: 'none', //图标,
+                    duration: 2000, //延迟时间,
+                    mask: true
+                });
                 reject(false)
             },
             complete: function() {

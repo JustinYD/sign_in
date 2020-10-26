@@ -11,7 +11,8 @@ const store = new Vuex.Store({
             className: '',
             role: '',
             sex: '',
-            stuNum: ''
+            stuNum: '',
+            tel: ''
         },
         msg: 'dsfsdfsd'
     },

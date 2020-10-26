@@ -47,7 +47,7 @@
             
           </van-cell-group>
           <button plain class="submitBtn" @click="submit">
-            提交
+            登录/注册
           </button>
         
       </van-row>
@@ -75,7 +75,7 @@
             
           </van-cell-group>
           <button plain class="submitBtn" @click="submitTea">
-            提交
+            登录/注册
           </button>
       </van-row>
       <van-dialog
@@ -145,6 +145,7 @@ export default {
         sex: this.sex,
         role:this.role.role
       }
+      console.log(data)
       this.$http.post({
             url:"/regStu",
             data:data
@@ -153,17 +154,29 @@ export default {
             if (res.status == 200) {
               store.commit('changeRole', data)
               wx.showToast({
-                title: '注册成功', //提示的内容,
+                title: res.msg, //提示的内容,
                 icon: 'success', //图标,
                 duration: 2000, //延迟时间,
                 mask: true, //显示透明蒙层，防止触摸穿透,
-                // success: res => {
-                //   mpvue.switchTab({url:'/pages/index/main'})
-                // }
+                success: res => {
+                  mpvue.switchTab({url:'/pages/index/main'})
+                }
               });
-            } else {
+            } else if(res.status == 201) {
+              store.commit('changeRole', data)
               wx.showToast({
-                title: '注册失败', //提示的内容,
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+                success: res => {
+                  mpvue.switchTab({url:'/pages/index/main'})
+                }
+              });
+            } 
+            else {
+              wx.showToast({
+                title: res.msg, //提示的内容,
                 icon: 'none', //图标,
                 duration: 2000, //延迟时间,
                 mask: true
@@ -188,17 +201,29 @@ export default {
             if (res.status == 200) {
               store.commit('changeRole', data)
               wx.showToast({
-                title: '注册成功', //提示的内容,
+                title: res.msg, //提示的内容,
                 icon: 'success', //图标,
                 duration: 2000, //延迟时间,
                 mask: true, //显示透明蒙层，防止触摸穿透,
-                // success: res => {
-                //   mpvue.switchTab({url:'/pages/index/main'})
-                // }
+                success: res => {
+                  mpvue.switchTab({url:'/pages/index/main'})
+                }
               });
-            } else {
+            } else if(res.status == 201) {
+              store.commit('changeRole', data)
               wx.showToast({
-                title: '注册失败', //提示的内容,
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+                success: res => {
+                  mpvue.switchTab({url:'/pages/index/main'})
+                }
+              });
+            } 
+            else {
+              wx.showToast({
+                title: res.msg, //提示的内容,
                 icon: 'none', //图标,
                 duration: 2000, //延迟时间,
                 mask: true
@@ -216,6 +241,31 @@ export default {
       });
       // mpvue.switchTab({url:'/pages/index/main'})
     },
+    getOpenId(role){  //获取用户的openid
+			let _this=this
+			wx.login({
+			  success(res) {
+			  	  	if (res.code) {
+				      // 发起网络请求
+				      wx.request({
+				        url: 'https://api.weixin.qq.com/sns/jscode2session',
+				        data: {
+				            appid:'wx94de1f8bea88c043',  //开发者appid
+				            secret:'a2050000a960ee55972f64eec7e4cfbd', //开发者AppSecret(小程序密钥)	
+				            grant_type:"authorization_code",  //默认authorization_code
+				            js_code: res.code    //wx.login登录获取的code值
+				        },
+				        success(res) {
+                  _this.role.openid= res.data.openid
+                  wx.hideLoading()			   
+						}
+				      })
+				    } else {
+				      console.log('登录失败！' + res.errMsg)
+				    }
+			  }
+      })
+		},
     test () {
       var that = this
       Dialog.alert({
@@ -236,7 +286,6 @@ export default {
   onShow () {
     var role = store.state.role
     this.role=role
-    console.log(role)
   }
 }
 </script>

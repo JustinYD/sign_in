@@ -1,5 +1,6 @@
 <template>
   <div>
+    <img src="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/%E9%A2%84%E8%A7%88%E5%9B%BE_%E5%8D%83%E5%9B%BE%E7%BD%91_%E7%BC%96%E5%8F%B735756891.png" style="width:100%" />
     <div v-if="show">
     <van-dialog
       id="van-dialog"
@@ -115,16 +116,13 @@ export default {
     }
   },
   onShow () {
-    var that = this
     var role = store.state.role
-    console.log(role)
     if (role.role == 'teacher') {
       this.show = false
     } else {
       this.show = true
     }
     this.getLocation()
-    this.motto = store.state.msg
   }
 }
 </script>

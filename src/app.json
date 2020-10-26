@@ -4,7 +4,8 @@
         "pages/index/main",
         "pages/about/main",
         "pages/register/main",
-        "pages/myself/main"
+        "pages/myself/main",
+        "pages/myclass/main"
     ],
     "window": {
         "backgroundTextStyle": "light",

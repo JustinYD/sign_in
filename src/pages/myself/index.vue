@@ -1,88 +1,196 @@
 <template>
-  <div >
-    个人信息
-    
+  <div>
+    <div v-if="role.role=='student'">
+      <van-dialog
+        id="van-dialog"
+      />
+      <van-toast
+        id="van-toast" />
+      <van-row>
+          <van-cell-group>
+            <van-field
+              :value="role.name"
+              required
+              clearable
+              label="姓名"
+              placeholder="请输入姓名"
+              @change="onChangeName"
+            />
+            <van-field
+              :value="role.stuNum"
+              required
+              type="digit"
+              clearable
+              label="学号"
+              placeholder="请输入学号"
+              @change="onChangeNum"
+            />
+            <van-field
+              :value="role.className"
+              required
+              clearable
+              label="班级"
+              placeholder="请输入班级"
+              @change="onChangeClass"
+            />
+            <van-field
+              :value="role.sex"
+              required
+              clearable
+              label="性别"
+              placeholder="请选择性别"
+              @click="setSex"
+            />
+            <div v-show="setSexFlag">
+              <van-picker :columns="options" @change="onChangeSex" />
+            </div>
+            
+          </van-cell-group>
+          <button plain class="submitBtn" @click="submit">
+            更新
+          </button>
+        
+      </van-row>
+    </div>
+    <div v-else-if="role.role=='teacher'">
+      <van-row>
+          <van-cell-group>
+            <van-field
+              :value="role.name"
+              required
+              clearable
+              label="姓名"
+              placeholder="请输入姓名"
+              @change="onChangeName"
+            />
+            <van-field
+              :value="role.tel"
+              required
+              type="digit"
+              clearable
+              label="手机号"
+              placeholder="请输入手机号"
+              @change="onChangeTel"
+            />
+            
+          </van-cell-group>
+          <button plain class="submitBtn" @click="submitTea">
+            更新
+          </button>
+      </van-row>
+      <van-dialog
+        id="van-dialog"
+      />
+    </div>
   </div>
+  
 </template>
 
 <script>
 import store from '../../utils/store'
+import Dialog from '../../../static/vant/dialog/dialog'
+import Toast from '../../../static/vant/toast/toast';
 export default {
   data () {
     return {
+      options: ['男', '女'],
       motto: 'Hello miniprograme',
       address: {},
+      role:{},
+      setSexFlag:false,
       show: true,
-      role:{}
+      right_width: 65,
+      left_width: 65
     }
   },
 
   methods: {
-    isLogin(role){	
-      wx.showLoading({
-        title: '加载中...' 
-      })	
-			var _this=this;
-	        wx.getSetting({
-	          success(res) {    	          	 
-	            if (!res.authSetting['scope.userInfo']) {//未授权getUserInfo            	
-	              wx.authorize({
-	                scope: 'scope.getUserInfo',
-	                success(res) {	                
-	                  _this.getOpenId(role)
-	                },
-	                fail(err){
-                   console.log(err)
-                   wx.hideLoading()
-	                }
-	              })
-	            }else{//已授权
-	              wx.getUserInfo({
-	                success(res) {	
-	                	_this.getOpenId(role)
-	                },
-	                fail(err) {
-                    console.log(err)
-                    wx.hideLoading()
-	                }
-	              })
-	            }
-	          }
-	        })
-	    },
-    getOpenId(role){  //获取用户的openid
-			let _this=this
-			wx.login({
-			  success(res) {
-			  	  	if (res.code) {
-				      // 发起网络请求
-				      wx.request({
-				        url: 'https://api.weixin.qq.com/sns/jscode2session',
-				        data: {
-				            appid:'wx94de1f8bea88c043',  //开发者appid
-				            secret:'a2050000a960ee55972f64eec7e4cfbd', //开发者AppSecret(小程序密钥)	
-				            grant_type:"authorization_code",  //默认authorization_code
-				            js_code: res.code    //wx.login登录获取的code值
-				        },
-				        success(res) {
-                  store.commit('changeOpenid', res.data.openid)
-                  wx.hideLoading()			   
-						}
-				      })
-				    } else {
-				      console.log('登录失败！' + res.errMsg)
-				    }
-			  }
-      })
-		},
-    routeHome(){
-      wx.switchTab({url: '../index/main'})
+    setSex(){
+      this.setSexFlag = true
     },
-    register(role){
-      this.isLogin()
-      store.commit('changeStu', role)
-      mpvue.navigateTo({url: '../register/main'})
-      // console.log(store.state.role)
+    onChangeName(event) {
+    // event.detail 为当前输入的值
+      this.role.name = event.mp.detail;
+    },
+    onChangeNum(event) {
+    // event.detail 为当前输入的值
+      this.role.stuNum = event.mp.detail;
+    },
+    onChangeTel(event) {
+    // event.detail 为当前输入的值
+      this.role.tel = event.mp.detail;
+    },
+    onChangeClass(event) {
+    // event.detail 为当前输入的值
+      this.role.className = event.mp.detail;
+    },
+    onChangeSex(event) {
+      this.role.sex=event.mp.detail.value;
+      this.setSexFlag = false
+    },
+    onClickLeft(){
+      console.log(1)
+    },
+    submit(){
+      var data=this.role
+      this.$http.post({
+            url:"/updateInfo",
+            data:data
+        }).then(res =>{
+            if (res.status == 200) {
+              store.commit('changeRole', data)
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透
+              });
+            }
+            else {
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+                mask: true
+              });
+            }
+            
+        })
+      
+    },
+    submitTea(){
+      var data=this.role
+      this.$http.post({
+            url:"/updateInfo",
+            data:data
+        }).then(res =>{
+            if (res.status == 200) {
+              store.commit('changeRole', data)
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                mask: true, //显示透明蒙层，防止触摸穿透,
+              });
+            } else {
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+                mask: true
+              });
+            }
+            
+        })
+    },
+    test1(){
+      console.log(this.name,this.stuNum,this.className)
+      Dialog.alert({
+        message: this.name,
+      }).then(() => {
+        // on close
+      });
+      // mpvue.switchTab({url:'/pages/index/main'})
     },
     test () {
       var that = this
@@ -90,30 +198,39 @@ export default {
         message: '地址信息',
         showCancelButton: true
       }).then(() => {
-        that.$http.get({
-            url:"/getlw_10"
-        }).then(res =>{
-            console.log(res)
-        })
+        // that.$http.get({
+        //     url:"/getlw_10"
+        // }).then(res =>{
+        //     console.log(res)
+        // })
+        console.log(this.address)
       }).catch(() => {
         console.log('no')
       })
-    }
+    },
   },
   onShow () {
-    var that = this
-    var role = store.state.role
-    this.role=role
+    this.role=store.state.role
   }
 }
 </script>
 
 <style scoped>
-.bottom-button {
-  width: 260px;
-  height: 40px;
+.submitBtn{
+  margin-top: 20px;
+  width: 80%;
+  color: white;
+  border-color:rgb(52, 132, 236);
+  background: rgb(52, 132, 236);
 }
-.stuOrTea{
-  margin-top:50%
+.submitBtn:active{
+  background: rgb(134, 173, 224);
+  border-color: rgb(134, 173, 224);
+}
+.submitForm{
+  height: 28px;
+  margin: 10px 0;
+  padding: 5px 10%;
+  border-bottom:rgb(52, 132, 236) 1px solid;
 }
 </style>
