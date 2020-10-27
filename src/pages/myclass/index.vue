@@ -1,11 +1,74 @@
 <template>
   <div>
+    <!-- 老师 -->
     <div v-if="show">
-      <van-empty
-        image="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/404.png"
-        description="未创建任何课程"
-      />
+      <div v-if="classData.length > 0">
+        <van-dialog
+          id="van-dialog"
+        />
+        <img src="/static/tabs/add.png" @click="createClass" class="createBtn" />
+        <div v-for="item in classData" :key="item">
+          <van-swipe-cell
+            id="swipe-cell"
+            right-width="60"
+            async-close
+            @close="onClose"
+          >
+            <div class="classList" @click="getClassTemp(item)">
+              <h3 style="font-weight:600"> {{item.classname}} </h3>
+              <h5 style="color:lightgrey;margin-top:5px">{{item.createtime}}</h5>
+            </div>
+            <view slot="right" style="height:100%">
+              <van-button type="danger" @click="getId(item.id)">
+                删除
+              </van-button>
+            </view>
+          </van-swipe-cell>
+        </div>
+        <van-popup
+          v-bind:show="changeFlag"
+          closeable
+          close-icon="close"
+          position="bottom"
+          z-index="100"
+          custom-style="height: 50%"
+          @close="closeChange"
+        >
+          <div style="margin-top:50px">
+            <van-row>
+              <van-cell-group>
+                <van-field
+                  :value="classTemp.classname"
+                  required
+                  clearable
+                  label="课程名称"
+                  placeholder="请输入课程名称"
+                  @change="onChangeClassName"
+                />
+                </van-cell-group>
+                <button plain class="submitBtn" @click="updateClass">
+                  修改课程
+                </button>
+            </van-row>
+          </div>
+        </van-popup>
+      </div>
+      <div v-else>
+        <van-empty
+          image="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/404.png"
+          description="未创建任何课程"
+        >
+          <van-button
+            type="danger"
+            @click="createClass"
+            color="linear-gradient(to right, #4bb0ff, #6149f6)"
+          >
+            创建课程
+          </van-button>
+        </van-empty>
+      </div>
     </div>
+    <!-- 学生 -->
     <div v-else>
       学生
     </div>
@@ -14,77 +77,125 @@
 
 <script>
 import store from '../../utils/store'
+import Dialog from "../../../static/vant/dialog/dialog"
 export default {
   data () {
     return {
       motto: 'Hello miniprograme',
       show:true,
-      address: {}
+      address: {},
+      classData:[],
+      classTemp:{},
+      classId:'',
+      changeFlag:false
     }
   },
 
   methods: {
-    getLocation () {
-      var that = this
-      wx.getSetting({
-          success: function(e) {
-            let userLocation = e.authSetting["scope.userLocation"]
-            if(typeof(userLocation)=="undefined"){  // 用户第一次授权地理位置
-                //1、获取当前位置坐标
-              wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                  //2、根据坐标获取当前位置名称，显示在顶部:逆地址解析
-                  that.address.lat = res.latitude
-                  that.address.lon = res.longitude
-                }
-              })
-            }else{  // 用户点了允许授权之后 又设置不允许获取位置的处理
-              wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                  //2、根据坐标获取当前位置名称，显示在顶部:逆地址解析
-                  that.address.lat = res.latitude
-                  that.address.lon = res.longitude
-                }
-              })
-            }
-          }
-        })
+    onChangeClassName(event) {
+    // event.detail 为当前输入的值
+      this.classTemp.classname = event.mp.detail;
     },
-    test () {
-      var that = this
-      this.getLocation()
+    closeChange(){
+      this.changeFlag=false
+      this.getTeacherClass()
     },
-    getMyRole(){
-      var that=this
-      var data=store.state.role
+    getClassTemp(item){
+      this.classTemp=item
+      this.changeFlag=true
+    },
+    getId(id){
+      this.classId = id
+    },
+    updateClass(){
+      var temp = this.classTemp
       this.$http.post({
-            url:"/getMyRole",
-            data:data
+            url:"/updateClass",
+            data:temp
         }).then(res =>{
-            if (res.status==200) {
-              var data=res.data[0]
-              var role={}
-              if(data[2]=='student'){
-                role.name=data[1]
-                role.stuNum=data[3]
-                role.className=data[4]
-                role.role=data[2]
-                role.sex=data[5]
-                role.openid=store.state.role.openid
-              }else{
-                role.openid=store.state.role.openid
-                role.name=data[1]
-                role.role=data[2]
-                role.tel=data[3]
-              }
-              store.commit('changeRole', role)
-              wx.navigateTo({ url: "../myself/main" });
+            if (res.status == 200) {
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                success: res => {
+                  this.changeFlag=false
+                  this.getTeacherClass()
+                }
+              });
             } else {
               return false
             }
         })
+    },
+    deleteTeacherClass(id){
+      var data={
+        id:id,
+        teacher_openid:store.state.role.openid
+      }
+      this.$http.post({
+            url:"/deleteClass",
+            data:data
+        }).then(res =>{
+            if (res.status == 200) {
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                success: res => {
+                  this.getTeacherClass()
+                }
+              });
+            } else {
+              return false
+            }
+        })
+    },
+    onClose(event) {
+      const { position, instance } = event.mp.detail;
+      switch (position) {
+        case 'left':
+        case 'cell':
+          instance.close();
+          break;
+        case 'right':
+          Dialog.confirm({
+            message: '确定删除吗？',
+          }).then(() => {
+            this.deleteTeacherClass(this.classId)
+            instance.close();
+          }).catch(()=>{
+            instance.close();
+          });
+          break;
+      }
+    },
+    getTeacherClass(){
+      var data=store.state.role
+      this.$http.post({
+            url:"/getTeacherClass",
+            data:data
+        }).then(res =>{
+            this.classData = []
+            wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+              });
+            if (res.status == 201) {
+              this.classData = []
+            } else {
+              const temp = res.data
+              for (let index = 0; index < temp.length; index++) {
+                const d = new Date(temp[index][3])
+                const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + temp[index][3].substring(16, 25)
+                this.classData.push({id:temp[index][0],classname:temp[index][1], createtime: time, status:temp[index][4]})
+              }
+            }
+        })
+    },
+    createClass(){
+      wx.navigateTo({ url: "../createclass/main" });
     }
   },
 
@@ -93,10 +204,10 @@ export default {
     var role = store.state.role
     if (role.role == 'teacher') {
       this.show = true
+      this.getTeacherClass()
     } else {
       this.show = false
     }
-    this.getLocation()
   }
 }
 </script>
@@ -105,10 +216,37 @@ export default {
 .aboutImg{
   width: 100%;
 }
-.itemList{
+.createBtn{
+  position: fixed;
+  display: block;
+  z-index: 99;
+  top: 60%;
+  right: 30px;
+  width: 40px;
+  height: 40px;
+}
+.classList{
+  width: 90%;
+  margin: 10px auto;
+  background: rgb(255, 255, 255);
+  padding: 5px;
+  border-left: 5px rgb(9, 207, 241) solid;
+}
+.submitBtn{
+  margin-top: 20px;
+  width: 80%;
+  color: white;
+  border-color:rgb(52, 132, 236);
+  background: rgb(52, 132, 236);
+}
+.submitBtn:active{
+  background: rgb(134, 173, 224);
+  border-color: rgb(134, 173, 224);
+}
+.submitForm{
+  height: 28px;
   margin: 10px 0;
-  background: rgb(37, 152, 247);
-  padding: 1px;
-  border-radius: 8px;
+  padding: 5px 10%;
+  border-bottom:rgb(52, 132, 236) 1px solid;
 }
 </style>
