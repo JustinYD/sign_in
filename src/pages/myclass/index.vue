@@ -16,7 +16,9 @@
           >
             <div class="classList" @click="getClassTemp(item)">
               <h3 style="font-weight:600"> {{item.classname}} </h3>
+              <h5 style="color:grey;margin-top:5px">课程编号{{item.id}}</h5>
               <h5 style="color:lightgrey;margin-top:5px">{{item.createtime}}</h5>
+              
             </div>
             <view slot="right" style="height:100%">
               <van-button type="danger" @click="getId(item.id)">
@@ -70,7 +72,45 @@
     </div>
     <!-- 学生 -->
     <div v-else>
-      学生
+      <div v-if="studentClassData.length > 0">
+        <van-dialog
+          id="van-dialog"
+        />
+        <img src="/static/tabs/add.png" @click="createStudentClass" class="createBtn" />
+        <div v-for="item in studenClassData" :key="item">
+          <van-swipe-cell
+            id="swipe-cell"
+            right-width="60"
+            async-close
+            @close="onClose"
+          >
+            <div class="classList" @click="getClassTemp(item)">
+              <h3 style="font-weight:600"> {{item.classname}} </h3>
+              <h5 style="color:lightgrey;margin-top:5px">{{item.createtime}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">课程编号{{item.id}}</h5>
+            </div>
+            <view slot="right" style="height:100%">
+              <van-button type="danger" @click="getId(item.id)">
+                删除
+              </van-button>
+            </view>
+          </van-swipe-cell>
+        </div>
+      </div>
+      <div v-else>
+        <van-empty
+          image="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/404.png"
+          description="未添加任何课程"
+        >
+          <van-button
+            type="danger"
+            @click="createStudentClass"
+            color="linear-gradient(to right, #4bb0ff, #6149f6)"
+          >
+            添加课程
+          </van-button>
+        </van-empty>
+      </div>
     </div>
   </div>
 </template>
@@ -85,6 +125,7 @@ export default {
       show:true,
       address: {},
       classData:[],
+      studentClassData:[],
       classTemp:{},
       classId:'',
       changeFlag:false
@@ -194,7 +235,36 @@ export default {
             }
         })
     },
+    getStudentClass(){
+      var data=store.state.role
+      this.$http.post({
+            url:"/getStudentClass",
+            data:data
+        }).then(res =>{
+            this.studentClassData = []
+            wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+              });
+            if (res.status == 201) {
+              this.studentClassData = []
+            } 
+            else {
+              const temp = res.data
+              console.log(temp)
+              // for (let index = 0; index < temp.length; index++) {
+              //   const d = new Date(temp[index][3])
+              //   const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + temp[index][3].substring(16, 25)
+              //   this.studentClassData.push({id:temp[index][0],classname:temp[index][1], createtime: time, status:temp[index][4]})
+              // }
+            }
+        })
+    },
     createClass(){
+      wx.navigateTo({ url: "../createclass/main" });
+    },
+    createStudentClass(){
       wx.navigateTo({ url: "../createclass/main" });
     }
   },
@@ -207,6 +277,7 @@ export default {
       this.getTeacherClass()
     } else {
       this.show = false
+      this.getStudentClass()
     }
   }
 }

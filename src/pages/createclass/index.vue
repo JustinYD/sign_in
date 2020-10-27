@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div v-if="role.role=='teacher'">
       <van-row>
           <van-cell-group>
             <van-field
@@ -19,6 +19,28 @@
       <van-dialog
         id="van-dialog"
       />
+    </div>
+
+    <!-- 学生 -->
+    <div v-else>
+      <van-search
+        :value="class_id"
+        label="课程编号"
+        placeholder="请输入课程编号"
+        input-align="center"
+        use-action-slot
+        @change="onChangeClassId"
+        @search="onSearchClass"
+      >
+        <view slot="action" @tap="onSearchClass">搜索</view>
+      </van-search>
+        <div v-if="classData.length>0">
+          <div class="classList" v-for="item in classData" :key="item">
+            <h3 style="font-weight:600"> {{item.class_name}} </h3>
+            <h5 style="color:grey;margin-top:5px"><span style="color:lightgrey">教师：</span>{{item.teacher_name}}</h5>
+            <h5 style="color:grey;margin-top:5px"><span style="color:lightgrey">课程编号：</span>{{item.class_id}}</h5>
+          </div>
+        </div>
     </div>
   </div>
   
@@ -41,6 +63,8 @@ export default {
       sex: '男',
       setSexFlag:false,
       classname: '',
+      class_id:'',
+      classData:[],
       show: true,
       right_width: 65,
       left_width: 65
@@ -51,6 +75,35 @@ export default {
     onChangeClassName(event) {
     // event.detail 为当前输入的值
       this.classname = event.mp.detail;
+    },
+    onChangeClassId(e){
+      this.class_id=e.mp.detail
+    },
+    onSearchClass(){
+      var data={class_id:this.class_id}
+      this.$http.post({
+            url:"/searchClass",
+            data:data
+        }).then(res =>{
+            this.classData=[]
+            if (res.status == 200) {
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+              });
+              const d = new Date(res.data[0][3])
+              const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + res.data[0][3].substring(16, 25)
+              this.classData.push({class_id:res.data[0][0], class_name:res.data[0][1], teacher_id:res.data[0][2], status:res.data[0][4], teacher_name:res.data[0][5]})
+              console.log(this.classData)
+            } else{
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'none', //图标,
+                duration: 2000, //延迟时间,
+              });
+            }
+        })
     },
     submit(){
       var data=store.state.role
@@ -157,5 +210,12 @@ export default {
   margin: 10px 0;
   padding: 5px 10%;
   border-bottom:rgb(52, 132, 236) 1px solid;
+}
+.classList{
+  width: 90%;
+  margin: 10px auto;
+  background: rgb(255, 255, 255);
+  padding: 5px;
+  border-left: 5px rgb(9, 207, 241) solid;
 }
 </style>

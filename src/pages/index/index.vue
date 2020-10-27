@@ -24,9 +24,14 @@
 
     <!-- 教师页面 -->
     <div v-else>
-      <div v-if="classData.length>0">
+      <div v-if="startClassData.length>0 || stopClassData.length>0">
         <img src="/static/tabs/add.png" @click="createClass" class="createBtn" />
-        <div v-for="item in classData" :key="item">
+        <div v-for="item in startClassData" :key="item">
+          {{item.classname}}
+          {{item.status?'开始':'未开始'}}
+          {{item.teacher_name}}
+        </div>
+        <div v-for="item in stopClassData" :key="item">
           {{item.classname}}
           {{item.status?'开始':'未开始'}}
           {{item.teacher_name}}
@@ -61,7 +66,8 @@ export default {
       motto: 'Hello miniprograme',
       address: {},
       show: true,
-      classData:[],
+      startClassData:[],
+      stopClassData:[],
       classId:'',
       right_width: 65,
       left_width: 65
@@ -161,7 +167,8 @@ export default {
             url:"/getTeacherClass",
             data:data
         }).then(res =>{
-            this.classData = []
+            this.startClassData = []
+            this.stopClassData = []
             if (res.status == 201) {
               this.classData = []
             } else {
@@ -169,7 +176,11 @@ export default {
               for (let index = 0; index < temp.length; index++) {
                 const d = new Date(temp[index][3])
                 const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + temp[index][3].substring(16, 25)
-                this.classData.push({id:temp[index][0],classname:temp[index][1], createtime: time, status:temp[index][4],teacher_name:temp[index][5]})
+                if(temp[index][4]){
+                  this.startClassData.push({id:temp[index][0],classname:temp[index][1], createtime: time, status:temp[index][4],teacher_name:temp[index][5]})
+                }else{
+                  this.stopClassData.push({id:temp[index][0],classname:temp[index][1], createtime: time, status:temp[index][4],teacher_name:temp[index][5]})
+                }
               }
             }
         })

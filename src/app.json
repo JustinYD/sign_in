@@ -64,6 +64,7 @@
         "van-col": "/static/vant/col/index",
         "van-nav-bar": "/static/vant/nav-bar/index",
         "van-field": "/static/vant/field/index",
-        "van-picker": "/static/vant/picker/index"
+        "van-picker": "/static/vant/picker/index",
+        "van-search": "/static/vant/search/index"
     }
 }
