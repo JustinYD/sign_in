@@ -12,24 +12,21 @@
             id="van-dialog"
           />
           <img src="/static/tabs/add.png" @click="createStudentClass" class="createBtn" />
-          <div v-for="item in studenClassData" :key="item">
-            <van-swipe-cell
-              id="swipe-cell"
-              right-width="60"
-              async-close
-              @close="onClose"
-            >
-              <div class="classList" @click="getClassTemp(item)">
-                <h3 style="font-weight:600"> {{item.classname}} </h3>
-                <h5 style="color:lightgrey;margin-top:5px">{{item.createtime}}</h5>
-                <h5 style="color:lightgrey;margin-top:5px">课程编号{{item.id}}</h5>
-              </div>
-              <view slot="right" style="height:100%">
-                <van-button type="danger" @click="getId(item.id)">
-                  删除
-                </van-button>
-              </view>
-            </van-swipe-cell>
+          <div v-for="item in startStudentClassData" :key="item">
+            <div class="classList" @click="getClassTemp(item)">
+              <h3 style="font-weight:600"> {{item.class_name}} </h3>
+              <h5 style="color:grey;margin-top:5px">任课教师：{{item.teacher_name}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">课程编号：{{item.class_id}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">添加时间：{{item.createtime}}</h5>
+            </div>
+          </div>
+          <div v-for="item in stopStudentClassData" :key="item">
+            <div class="classList" @click="getClassTemp(item)">
+              <h3 style="font-weight:600"> {{item.class_name}} </h3>
+              <h5 style="color:grey;margin-top:5px">任课教师：{{item.teacher_name}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">课程编号：{{item.class_id}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">添加时间：{{item.createtime}}</h5>
+            </div>
           </div>
         </div>
         <!-- 学生未添加任何课程 -->
@@ -98,6 +95,7 @@ export default {
       startStudentClassData:[],
       stopStudentClassData:[],
       classId:'',
+      classtemp: {},
       right_width: 65,
       left_width: 65
     }
@@ -113,6 +111,9 @@ export default {
     onClose() {
       this.show = false
       console.log('关闭')
+    },
+    getClassTemp(item){
+      this.classTemp=item
     },
     getLocation () {
       var that = this
