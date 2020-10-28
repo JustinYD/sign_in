@@ -3,26 +3,30 @@
     <!-- 老师 -->
     <div v-if="show">
       <div v-if="classData.length > 0">
-        <van-dialog
-          id="van-dialog"
-        />
+        <van-dialog id="van-dialog" />
         <img src="/static/tabs/add.png" @click="createClass" class="createBtn" />
         <div v-for="item in classData" :key="item">
           <van-swipe-cell
             id="swipe-cell"
             right-width="60"
+            left-width="60"
             async-close
             @close="onClose"
           >
             <div class="classList" @click="getClassTemp(item)">
               <h3 style="font-weight:600"> {{item.classname}} </h3>
-              <h5 style="color:grey;margin-top:5px">课程编号{{item.id}}</h5>
+              <h5 style="color:grey;margin-top:5px">课程编号：{{item.id}}</h5>
               <h5 style="color:lightgrey;margin-top:5px">{{item.createtime}}</h5>
               
             </div>
             <view slot="right" style="height:100%">
               <van-button type="danger" @click="getId(item.id)">
                 删除
+              </van-button>
+            </view>
+            <view slot="left" style="height:100%">
+              <van-button type="primary" @click="getClassTemp(item)">
+                修改
               </van-button>
             </view>
           </van-swipe-cell>
@@ -72,25 +76,24 @@
     </div>
     <!-- 学生 -->
     <div v-else>
+      <van-dialog id="van-dialog" />
       <div v-if="studentClassData.length > 0">
-        <van-dialog
-          id="van-dialog"
-        />
         <img src="/static/tabs/add.png" @click="createStudentClass" class="createBtn" />
-        <div v-for="item in studenClassData" :key="item">
+        <div v-for="item in studentClassData" :key="item">
           <van-swipe-cell
             id="swipe-cell"
             right-width="60"
             async-close
-            @close="onClose"
+            @close="onStudentClose"
           >
             <div class="classList" @click="getClassTemp(item)">
-              <h3 style="font-weight:600"> {{item.classname}} </h3>
-              <h5 style="color:lightgrey;margin-top:5px">{{item.createtime}}</h5>
-              <h5 style="color:lightgrey;margin-top:5px">课程编号{{item.id}}</h5>
+              <h3 style="font-weight:600"> {{item.class_name}} </h3>
+              <h5 style="color:grey;margin-top:5px">任课教师：{{item.teacher_name}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">课程编号：{{item.class_id}}</h5>
+              <h5 style="color:lightgrey;margin-top:5px">添加时间：{{item.createtime}}</h5>
             </div>
             <view slot="right" style="height:100%">
-              <van-button type="danger" @click="getId(item.id)">
+              <van-button type="danger" @click="getDelStudentClass(item)">
                 删除
               </van-button>
             </view>
@@ -126,6 +129,7 @@ export default {
       address: {},
       classData:[],
       studentClassData:[],
+      studentClass:{},
       classTemp:{},
       classId:'',
       changeFlag:false
@@ -143,10 +147,12 @@ export default {
     },
     getClassTemp(item){
       this.classTemp=item
-      this.changeFlag=true
     },
     getId(id){
       this.classId = id
+    },
+    getDelStudentClass(item){
+      this.studentClass = item
     },
     updateClass(){
       var temp = this.classTemp
@@ -192,10 +198,57 @@ export default {
             }
         })
     },
+    delStudentClass(item){
+      this.$http.post({
+            url:"/deleteStudentClass",
+            data:item
+        }).then(res =>{
+            if (res.status == 200) {
+              wx.showToast({
+                title: res.msg, //提示的内容,
+                icon: 'success', //图标,
+                duration: 2000, //延迟时间,
+                success: res => {
+                  this.getStudentClass()
+                }
+              });
+            } else {
+              return false
+            }
+        })
+    },
+    onStudentClose(event) {
+      const { position, instance } = event.mp.detail;
+      switch (position) {
+        case 'left':
+        case 'cell':
+          instance.close();
+          break;
+        case 'right':
+          Dialog.confirm({
+            message: '确定从我的课程删除《'+ this.studentClass.class_name + '》吗？',
+          }).then(() => {
+            this.delStudentClass(this.studentClass)
+            instance.close();
+          }).catch(()=>{
+            instance.close();
+          });
+          break;
+      }
+    },
     onClose(event) {
       const { position, instance } = event.mp.detail;
       switch (position) {
         case 'left':
+          Dialog.confirm({
+            message: '确定修改吗？',
+          }).then(() => {
+            this.changeFlag=true
+            instance.close();
+          }).catch(()=>{
+            instance.close();
+          });
+          break;
         case 'cell':
           instance.close();
           break;
@@ -250,14 +303,21 @@ export default {
             if (res.status == 201) {
               this.studentClassData = []
             } 
-            else {
+            else if(res.status == 200) {
               const temp = res.data
-              console.log(temp)
-              // for (let index = 0; index < temp.length; index++) {
-              //   const d = new Date(temp[index][3])
-              //   const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + temp[index][3].substring(16, 25)
-              //   this.studentClassData.push({id:temp[index][0],classname:temp[index][1], createtime: time, status:temp[index][4]})
-              // }
+              for (let index = 0; index < temp.length; index++) {
+                const d = new Date(temp[index][8])
+                const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + temp[index][8].substring(16, 25)
+                this.studentClassData.push({
+                  teacher_id:temp[index][0],
+                  teacher_name:temp[index][1],
+                  student_id:temp[index][2],
+                  student_name:temp[index][3],
+                  class_id:temp[index][4],
+                  class_name:temp[index][5],
+                  createtime: time, 
+                  status:temp[index][7]})
+              }
             }
         })
     },

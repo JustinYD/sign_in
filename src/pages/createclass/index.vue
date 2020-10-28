@@ -23,6 +23,9 @@
 
     <!-- 学生 -->
     <div v-else>
+      <van-dialog
+          id="van-dialog"
+      />
       <van-search
         :value="class_id"
         label="课程编号"
@@ -35,7 +38,7 @@
         <view slot="action" @tap="onSearchClass">搜索</view>
       </van-search>
         <div v-if="classData.length>0">
-          <div class="classList" v-for="item in classData" :key="item">
+          <div class="classList" v-for="item in classData" :key="item" @click="add_my_class(item)">
             <h3 style="font-weight:600"> {{item.class_name}} </h3>
             <h5 style="color:grey;margin-top:5px"><span style="color:lightgrey">教师：</span>{{item.teacher_name}}</h5>
             <h5 style="color:grey;margin-top:5px"><span style="color:lightgrey">课程编号：</span>{{item.class_id}}</h5>
@@ -72,6 +75,45 @@ export default {
   },
 
   methods: {
+    // 点击添加课程
+    add_my_class(item){
+      var role=store.state.role
+      var data={
+        teacher_id:item.teacher_id,
+        teacher_name:item.teacher_name,
+        student_id:role.openid,
+        student_name:role.name,
+        class_id:item.class_id,
+        class_name:item.class_name,
+        majorName:role.className
+      }
+      Dialog.confirm({
+            message: '确定添加《'+ data.class_name + '》该门课程吗？',
+            }).then(() => {
+              this.$http.post({
+              url:"/studentAddClass",
+              data:data
+          }).then(res =>{
+              if (res.status == 200) {
+                wx.showToast({
+                  title: res.msg, //提示的内容,
+                  icon: 'success', //图标,
+                  duration: 2000, //延迟时间,
+                  success:res=>{
+                    wx.navigateBack()
+                  }
+                });
+              } else{
+                wx.showToast({
+                  title: res.msg, //提示的内容,
+                  icon: 'none', //图标,
+                  duration: 2000, //延迟时间,
+                });
+              }
+          })
+          }).catch(()=>{
+          })
+    },
     onChangeClassName(event) {
     // event.detail 为当前输入的值
       this.classname = event.mp.detail;
@@ -90,7 +132,7 @@ export default {
               wx.showToast({
                 title: res.msg, //提示的内容,
                 icon: 'success', //图标,
-                duration: 2000, //延迟时间,
+                duration: 1000, //延迟时间,
               });
               const d = new Date(res.data[0][3])
               const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + res.data[0][3].substring(16, 25)

@@ -2,8 +2,8 @@
 /* eslint-disable spaced-comment */
 /* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable indent */
-const host = 'http://192.168.0.115:5000';
-// const host = 'http://192.168.1.223:5000'
+// const host = 'http://192.168.0.115:5000'
+const host = 'http://192.168.1.223:5000'
 
 function request(url, method, data, header = {}) {
     wx.showLoading({
