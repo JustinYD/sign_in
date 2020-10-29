@@ -1,33 +1,57 @@
 <template>
   <div>
-    <img src="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/%E9%A2%84%E8%A7%88%E5%9B%BE_%E5%8D%83%E5%9B%BE%E7%BD%91_%E7%BC%96%E5%8F%B735756891.png" style="width:100%" />
+    <img
+      src="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/%E9%A2%84%E8%A7%88%E5%9B%BE_%E5%8D%83%E5%9B%BE%E7%BD%91_%E7%BC%96%E5%8F%B735756891.png"
+      style="width:100%"
+    />
     <!-- 学生界面 -->
     <div v-if="show">
+      <van-dialog
+        id="van-dialog"
+      />
+      <!-- 已经添加的课程，只显示可打卡课程 -->
+      <div
+        v-if="startStudentClassData.length > 0"
+      >
         <van-dialog
           id="van-dialog"
         />
-        <!-- 已经添加的课程，只显示可打卡课程 -->
-        <div v-if="startStudentClassData.length > 0">
-          <van-dialog
-            id="van-dialog"
-          />
-          <img src="/static/tabs/add.png" @click="createStudentClass" class="createBtn" />
-          <div v-for="item in startStudentClassData" :key="item">
-            <div class="startClassList" @click="sign_in_class(item)">
-              <h3 style="font-weight:600"> {{item.class_name}} </h3>
-              <h5 style="color:grey;margin-top:5px">任课教师：{{item.teacher_name}}</h5>
-              <h5 style="color:lightgrey;margin-top:5px">课程编号：{{item.class_id}}</h5>
-            </div>
+        <img
+          src="/static/tabs/add.png"
+          @click="createStudentClass"
+          class="createBtn"
+        />
+        <div
+          v-for="item in startStudentClassData"
+          :key="item"
+        >
+          <div
+            class="startClassList"
+            @click="sign_in_class(item)"
+          >
+            <h3
+              style="font-weight:600"
+            > {{item.class_name}}
+            </h3>
+            <h5
+              style="color:grey;margin-top:5px"
+            >任课教师：{{item.teacher_name}}
+            </h5>
+            <h5
+              style="color:lightgrey;margin-top:5px"
+            >课程编号：{{item.class_id}}
+            </h5>
           </div>
         </div>
-        <!-- 学生未添加任何课程 -->
-        <div v-else>
-          <van-empty
-            image="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/404.png"
-            description="没有课程需要打卡！"
-          >
-          </van-empty>
-        </div>
+      </div>
+      <!-- 学生未添加任何课程 -->
+      <div v-else>
+        <van-empty
+          image="https://sign-in-ypd.oss-cn-chengdu.aliyuncs.com/404.png"
+          description="没有课程需要打卡！"
+        >
+        </van-empty>
+      </div>
     </div>
 
     <!-- 教师页面 -->
@@ -35,17 +59,51 @@
       <van-dialog
         id="van-dialog"
       />
-      <div v-if="startClassData.length>0 || stopClassData.length>0">
-        <img src="/static/tabs/add.png" @click="createClass" class="createBtn" />
-        <div class="teacherStartClassList" v-for="item in startClassData" :key="item" @click="stop_my_class(item)">
-          <h3 style="font-weight:600"> {{item.classname}} </h3>
-          <h5 style="color:grey;margin-top:5px">{{item.status?'开始':'未开始'}}</h5>
-          <h5 style="color:lightgrey;margin-top:5px">课程编号：{{item.id}}</h5>
+      <div
+        v-if="startClassData.length>0 || stopClassData.length>0"
+      >
+        <img
+          src="/static/tabs/add.png"
+          @click="createClass"
+          class="createBtn"
+        />
+        <div
+          class="teacherStartClassList"
+          v-for="item in startClassData"
+          :key="item"
+          @click="stop_my_class(item)"
+        >
+          <h3
+            style="font-weight:600"
+          > {{item.classname}}
+          </h3>
+          <h5
+            style="color:grey;margin-top:5px"
+          >{{item.status?'开始':'未开始'}}
+          </h5>
+          <h5
+            style="color:lightgrey;margin-top:5px"
+          >课程编号：{{item.id}}
+          </h5>
         </div>
-        <div class="teacherStopClassList" v-for="item in stopClassData" :key="item" @click="start_my_class(item)">
-          <h3 style="font-weight:600"> {{item.classname}} </h3>
-          <h5 style="color:grey;margin-top:5px">{{item.status?'开始':'未开始'}}</h5>
-          <h5 style="color:lightgrey;margin-top:5px">课程编号：{{item.id}}</h5>
+        <div
+          class="teacherStopClassList"
+          v-for="item in stopClassData"
+          :key="item"
+          @click="start_my_class(item)"
+        >
+          <h3
+            style="font-weight:600"
+          > {{item.classname}}
+          </h3>
+          <h5
+            style="color:grey;margin-top:5px"
+          >{{item.status?'开始':'未开始'}}
+          </h5>
+          <h5
+            style="color:lightgrey;margin-top:5px"
+          >课程编号：{{item.id}}
+          </h5>
         </div>
         <van-popup
           v-bind:show="startFlag"
@@ -56,7 +114,9 @@
           custom-style="height: 50%"
           @close="closeChange"
         >
-          <div style="margin-top:50px">
+          <div
+            style="margin-top:50px"
+          >
             <van-row>
               <van-cell-group>
                 <van-field
@@ -67,10 +127,14 @@
                   placeholder="请输入本次课堂标记"
                   @change="onStartTag"
                 />
-                </van-cell-group>
-                <button plain class="submitBtn" @click="startClass">
-                  提交
-                </button>
+              </van-cell-group>
+              <button
+                plain
+                class="submitBtn"
+                @click="startClass"
+              >
+                提交
+              </button>
             </van-row>
           </div>
         </van-popup>
@@ -91,7 +155,7 @@
       </div>
     </div>
   </div>
-  
+
 </template>
 
 <script>
@@ -114,54 +178,76 @@ export default {
       classtemp: {},
       right_width: 65,
       left_width: 65,
-      startTemp:{}
+      clearTimeSet:'',
+      startTemp:{},
+      distance:''
     }
   },
 
   methods: {
+    getDis(data){
+      this.$http.post({
+                url:"/getdistance",
+                data:data
+              }).then(res =>{
+                  if (res.status == 200) {
+                    this.distance=res.data
+                    console.log(this.distance)
+                  }
+              })
+		},
     onStartTag(event) {
     // event.detail 为当前输入的值
       this.startTag = event.mp.detail;
     },
     sign_in_class(item){
       var role=store.state.role
-      var data={
-        id:item.id,
-        status:true,
-        classname:item.classname
-      }
-      
       Dialog.confirm({
             message: '确定打卡《'+ item.class_name + '》该门课程吗？',
             }).then(() => {
-              // this.$http.post({
-              //   url:"/updateClass",
-              //   data:data
-              // }).then(res =>{
-              //     if (res.status == 200) {
-              //       wx.showToast({
-              //         title: '开始打卡', //提示的内容,
-              //         icon: 'success', //图标,
-              //         duration: 2000, //延迟时间,
-              //         success:res=>{
-              //           this.getTeacherClass()
-              //         }
-              //       });
-              //     } else{
-              //       wx.showToast({
-              //         title: '开启失败', //提示的内容,
-              //         icon: 'none', //图标,
-              //         duration: 2000, //延迟时间,
-              //       });
-              //     }
-              // })
-              console.log(item,role)
+              this.getLocation()
+              var getDis={
+                lat:this.address.lat,
+                lng:this.address.lng,
+                mlat:item.mlat,
+                mlng:item.mlng
+              }
+              this.getDis(getDis)
+              if (this.distance < 100) {
+                this.$http.post({
+                  url:"/sign_in",
+                  data:item
+                }).then(res =>{
+                    if (res.status == 200) {
+                      wx.showToast({
+                        title: '打卡成功', //提示的内容,
+                        icon: 'success', //图标,
+                        duration: 2000, //延迟时间,
+                      });
+                    } else{
+                      wx.showToast({
+                        title: '打卡失败', //提示的内容,
+                        icon: 'none', //图标,
+                        duration: 2000, //延迟时间,
+                      });
+                    }
+                })
+              } else {
+                wx.showToast({
+                    title: '打卡失败!不在打卡范围内!', //提示的内容,
+                    icon: 'none', //图标,
+                    duration: 4000, //延迟时间,
+                });
+              }
             }).catch(()=>{
           })
     },
     startClass(){
+      this.getLocation()
       var data=this.startTemp
       data.startTag=this.startTag
+      data.mlat=this.address.lat
+      data.mlng=this.address.lng
       this.$http.post({
                 url:"/startOrStopClass",
                 data:data
@@ -206,9 +292,10 @@ export default {
       var data={
         id:item.id,
         status:false,
-        classname:item.classname
+        classname:item.classname,
+        teacher_id:role.openid,
+        startTag:this.startTag
       }
-      
       Dialog.confirm({
             message: '确定结束打卡《'+ item.classname + '》该门课程吗？',
             }).then(() => {
@@ -247,7 +334,7 @@ export default {
       console.log('关闭')
     },
     closeChange(){
-      this.changeFlag=false
+      this.startFlag=false
       this.getTeacherClass()
     },
     getClassTemp(item){
@@ -275,7 +362,7 @@ export default {
                 success: res => {
                   //2、根据坐标获取当前位置名称，显示在顶部:逆地址解析
                   that.address.lat = res.latitude
-                  that.address.lon = res.longitude
+                  that.address.lng = res.longitude
                 }
               })
             }
@@ -360,7 +447,7 @@ export default {
     getStudentClass(){
       var data=store.state.role
       this.$http.post({
-            url:"/getStudentClass",
+            url:"/getStudentSignClass",
             data:data
         }).then(res =>{
             this.startStudentClassData = []
@@ -370,36 +457,22 @@ export default {
               this.stopStudentClassData = []  
             } 
             else if(res.status == 200){
-              wx.showToast({
-                title: res.msg, //提示的内容,
-                icon: 'none', //图标,
-                duration: 2000, //延迟时间,
-              });
               const temp = res.data
               for (let index = 0; index < temp.length; index++) {
                 const d = new Date(temp[index][8])
                 const time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + temp[index][8].substring(16, 25)
-                if (temp[index][7]) {
-                  this.startStudentClassData.push({
-                    teacher_id:temp[index][0],
-                    teacher_name:temp[index][1],
-                    student_id:temp[index][2],
-                    student_name:temp[index][3],
-                    class_id:temp[index][4],
-                    class_name:temp[index][5],
+                this.startStudentClassData.push({
+                    teacher_id:temp[index][2],
+                    teacher_name:temp[index][3],
+                    student_id:temp[index][4],
+                    student_name:temp[index][5],
+                    class_id:temp[index][0],
+                    class_name:temp[index][1],
                     createtime: time, 
-                    status:true})
-                } else {
-                  this.stopStudentClassData.push({
-                    teacher_id:temp[index][0],
-                    teacher_name:temp[index][1],
-                    student_id:temp[index][2],
-                    student_name:temp[index][3],
-                    class_id:temp[index][4],
-                    class_name:temp[index][5],
-                    createtime: time, 
-                    status:false})
-                }
+                    status:true,
+                    startTag:temp[index][10],
+                    mlat:temp[index][11],
+                    mlng:temp[index][12]})
               }
             } else {
               this.startStudentClassData = []
@@ -407,6 +480,12 @@ export default {
             }
         })
     },
+    setTime() //设置定时器
+    {
+      this.clearTimeSet=setInterval(() => {
+        this.getStudentClass()
+      }, 1000);
+    }
   },
   onShow () {
     this.getMyRole()
@@ -416,9 +495,12 @@ export default {
       this.getTeacherClass()
     } else {
       this.show = true
-      this.getStudentClass()
+      this.setTime()
     }
     this.getLocation()
+  },
+  onHide() {
+    clearInterval(this.clearTimeSet)
   }
 }
 </script>
@@ -428,7 +510,7 @@ export default {
   width: 260px;
   height: 40px;
 }
-.createBtn{
+.createBtn {
   position: fixed;
   display: block;
   z-index: 99;
@@ -437,7 +519,7 @@ export default {
   width: 40px;
   height: 40px;
 }
-.startClassList{
+.startClassList {
   width: 90%;
   margin: 10px auto;
   background: rgb(255, 255, 255);
@@ -445,14 +527,14 @@ export default {
   border-left: 5px rgb(9, 207, 241) solid;
   border-right: 5px rgb(9, 207, 241) solid;
 }
-.stopClassList{
+.stopClassList {
   width: 90%;
   margin: 10px auto;
   background: rgb(255, 255, 255);
   padding: 5px;
   border-left: 5px rgb(172, 3, 250) solid;
 }
-.teacherStartClassList{
+.teacherStartClassList {
   width: 90%;
   margin: 10px auto;
   background: rgb(255, 255, 255);
@@ -460,7 +542,7 @@ export default {
   border-left: 5px rgb(9, 207, 241) solid;
   border-right: 5px rgb(9, 207, 241) solid;
 }
-.teacherStopClassList{
+.teacherStopClassList {
   width: 90%;
   margin: 10px auto;
   background: rgb(255, 255, 255);
@@ -468,14 +550,14 @@ export default {
   border-left: 5px rgb(172, 3, 250) solid;
   border-right: 5px rgb(172, 3, 250) solid;
 }
-.submitBtn{
+.submitBtn {
   margin-top: 20px;
   width: 80%;
   color: white;
-  border-color:rgb(52, 132, 236);
+  border-color: rgb(52, 132, 236);
   background: rgb(52, 132, 236);
 }
-.submitBtn:active{
+.submitBtn:active {
   background: rgb(134, 173, 224);
   border-color: rgb(134, 173, 224);
 }
