@@ -258,6 +258,6 @@ export default {
   margin: 10px auto;
   background: rgb(255, 255, 255);
   padding: 5px;
-  border-left: 5px rgb(9, 207, 241) solid;
+  border-left: 5px rgb(172, 3, 250) solid;
 }
 </style>
