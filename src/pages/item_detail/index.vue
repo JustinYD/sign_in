@@ -1,11 +1,12 @@
 <template>
   <div>
-    <div class="warp">
-      <!-- <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" @ec="ec"></ec-canvas> -->
-      <ec-canvas id="mychart-dom-bar" canvas-id="mychart-bar" :echarts="echarts"></ec-canvas>
-      <mpvue-echarts :echarts="echarts" :onInit="echartInit" />
+    <div class="wrap" v-if="chart">
+      <mpvue-echarts :echarts="echarts" :onInit="ecBarInit" canvasId="bar" />
     </div>
-    <div>
+    <div class="wrap" v-if="chart1">
+      <mpvue-echarts :echarts="echarts" :onInit="ecBarInit1" canvasId="scatter" />
+    </div>
+    <div style="margin-bottom:10%">
       <div v-for="item in no_sign_data" :key="item">
           <div class="noClassList">
             <span style="font-weight:600">姓名：{{item.student_name}} </span><van-tag type="danger">未打卡</van-tag>
@@ -27,59 +28,116 @@
 <script>
 import store from '../../utils/store'
 import Dialog from "../../../static/vant/dialog/dialog"
-// import * as echarts from '../../utils/echarts'
+import * as echarts from 'echarts/dist/echarts.min'
 import mpvueEcharts from 'mpvue-echarts'
-function initChart (canvas, width, height) {
-  const chart = echarts.init(canvas, null, {
-    width: width,
-    height: height
-  })
-  canvas.setChart(chart)
-  var option = {
-    backgroundColor: '#ffffff',
-    color: ['#37A2DA', '#32C5E9', '#67E0E3', '#91F2DE', '#FFDB5C', '#FF9F7F'],
-    series: [{
-      label: {
-        normal: {
-          fontSize: 14
+let barChart, scatterChart,tmp
+function getBarOption (sign_sum,no_sign_sum) {
+  return {
+    color: ['rgb(9, 207, 241)', 'rgb(250, 3, 77)'],
+    title: {
+        text: '打卡统计',
+        left: 'center'
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: '{b} : {c}'
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'left',
+        data: ['已打卡', '未打卡']
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [{value: sign_sum, name: '已打卡'},
+                {value: no_sign_sum, name: '未打卡'}],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
         }
-      },
-      type: 'pie',
-      center: ['50%', '50%'],
-      radius: [0, '60%'],
-      data: [{
-        value: 55,
-        name: '北京'
-      }, {
-        value: 20,
-        name: '武汉'
-      }, {
-        value: 10,
-        name: '杭州'
-      }, {
-        value: 20,
-        name: '广州'
-      }, {
-        value: 38,
-        name: '上海'
-      }
-      ],
-      itemStyle: {
-        emphasis: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 2, 2, 0.3)'
-        }
-      }
-    }]
+    ]
+    // tooltip: {
+    //     trigger: 'item',
+    //     formatter: '{b}: {c} '
+    // },
+    // legend: {
+    //     orient: 'vertical',
+    //     left: 10,
+    //     data: ['已打卡', '未打卡']
+    // },
+    // series: [
+    //     {
+    //         name: '打卡数据',
+    //         type: 'pie',
+    //         radius: ['50%', '70%'],
+    //         avoidLabelOverlap: false,
+    //         label: {
+    //             show: false,
+    //             position: 'center'
+    //         },
+    //         emphasis: {
+    //             label: {
+    //                 show: true,
+    //                 fontSize: '30',
+    //                 fontWeight: 'bold'
+    //             }
+    //         },
+    //         labelLine: {
+    //             show: false
+    //         },
+    //         data: [
+    //             {value: sign_sum, name: '已打卡'},
+    //             {value: no_sign_sum, name: '未打卡'}
+    //         ]
+    //     }
+    // ]
   }
-  chart.setOption(option)
-  return chart
+}
+
+function getBarOption1 (nameList,data) {
+  return {
+    color: ['#000080', '#FF9F7F', '#ff0080', '#C9C9C9', '#E066FF', '#C0FF3E','red'],
+    tooltip: {
+        trigger: 'item',
+        formatter: '{b}: {c} '
+    },
+    title: {
+        text: '专业统计',
+        left: 'center'
+    },
+    legend: {
+        orient: 'vertical',
+        left: 10,
+        data: nameList
+    },
+    series: [
+        {
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            },
+            type: 'pie',
+            radius: ['50%', '70%'],
+            data: data
+        }
+    ]
+  }
 }
 export default {
   components: {
     mpvueEcharts
   },
+  onShareAppMessage () {},
   data () {
     return {
       motto: 'Hello miniprograme',
@@ -90,16 +148,38 @@ export default {
       no_sign_sum:0,
       sign_data:[],
       no_sign_data:[],
-      majorData:[],
+      majorData:[{name:'无',value:1}],
+      majorName:['无'],
       studentClassData:[],
       studentClass:{},
       classTemp:{},
       classId:'',
-      changeFlag:false
+      changeFlag:false,
+      echarts,
+      chart:false,
+      chart1:false
     }
   },
-
+  
   methods: {
+    ecBarInit(canvas, width, height) {
+        barChart = echarts.init(canvas, null, {
+          width: width,
+          height: height
+        })
+        canvas.setChart(barChart)
+        barChart.setOption(getBarOption(this.sign_sum,this.no_sign_sum))
+        return barChart
+      },
+      ecBarInit1(canvas, width, height) {
+        scatterChart = echarts.init(canvas, null, {
+          width: width,
+          height: height
+        })
+        canvas.setChart(scatterChart)
+        scatterChart.setOption(getBarOption1(this.majorName,this.majorData))
+        return scatterChart
+      },
     echartInit (canvas, width, height) {
       return initChart(canvas, width, height)
     },
@@ -113,6 +193,7 @@ export default {
             this.sign_data=[]
             this.no_sign_data=[]
             this.majorData=[]
+            this.majorName=[]
             wx.showToast({
                 title: res.msg, //提示的内容,
                 icon: 'none', //图标,
@@ -125,7 +206,8 @@ export default {
               const temp_major = res.major_data
               const temp_status = res.status_data
               for (let index = 0; index < temp_major.length; index++) {
-                this.majorData.push({majorName:temp_major[index][0], sum: temp_major[index][1]})
+                this.majorData.push({name:temp_major[index][0], value: temp_major[index][1]})
+                this.majorName.push(temp_major[index][0])
               }
               for (let index = 0; index < temp_status.length; index++) {
                 if (temp_status[index][0] == '0') {
@@ -172,6 +254,8 @@ export default {
                     status:status})
                 }
               }
+              this.chart=true
+              this.chart1=true
             }
         })
     },
@@ -180,11 +264,30 @@ export default {
   onShow(){
     this.role=store.state.role
     var role = store.state.role
+    this.sign_sum=0
+    this.no_sign_sum=0
+    this.sign_data=[]
+    this.no_sign_data=[]
+    this.majorData=[]
+    this.majorName=[]
+    this.chart=false
+    this.chart1=false
+    this.getTeacherClass(tmp)
+  },
+  onHide(){
+    this.sign_sum=0
+    this.no_sign_sum=0
+    this.sign_data=[]
+    this.no_sign_data=[]
+    this.majorData=[]
+    this.majorName=[]
+    this.chart=false
+    this.chart1=false
   },
   // test.js
   onLoad(options) {
       var temp=JSON.parse(options.obj)
-      this.getTeacherClass(temp)
+      tmp=temp
   }
 }
 </script>
@@ -192,7 +295,6 @@ export default {
 <style scoped>
 .wrap {
   width: 100%;
-
   height: 300px;
 }
 .aboutImg {
