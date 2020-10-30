@@ -244,20 +244,21 @@ export default {
 			wx.login({
 			  success(res) {
 			  	  	if (res.code) {
-				      // 发起网络请求
-				      wx.request({
-				        url: 'https://api.weixin.qq.com/sns/jscode2session',
-				        data: {
+                var data={
 				            appid:'wx94de1f8bea88c043',  //开发者appid
 				            secret:'a2050000a960ee55972f64eec7e4cfbd', //开发者AppSecret(小程序密钥)	
 				            grant_type:"authorization_code",  //默认authorization_code
 				            js_code: res.code    //wx.login登录获取的code值
-				        },
-				        success(res) {
-                  _this.role.openid= res.data.openid
-                  wx.hideLoading()			   
-						}
-				      })
+				        }
+              _this.$http.post({
+                  url:"/getOpenid",
+                  data:data
+              }).then(res =>{
+                  if(res.status==200){
+                    _this.role.openid= res.data.openid
+                    wx.hideLoading()
+                  }
+              })
 				    } else {
 				      console.log('登录失败！' + res.errMsg)
 				    }
