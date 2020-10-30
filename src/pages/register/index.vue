@@ -145,7 +145,6 @@ export default {
         sex: this.sex,
         role:this.role.role
       }
-      console.log(data)
       this.$http.post({
             url:"/regStu",
             data:data
@@ -197,7 +196,6 @@ export default {
             url:"/regTea",
             data:data
         }).then(res =>{
-            console.log(res)
             if (res.status == 200) {
               store.commit('changeRole', data)
               wx.showToast({

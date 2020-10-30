@@ -83,6 +83,7 @@ export default {
         teacher_name:item.teacher_name,
         student_id:role.openid,
         student_name:role.name,
+        student_number:role.stuNum,
         class_id:item.class_id,
         class_name:item.class_name,
         majorName:role.className

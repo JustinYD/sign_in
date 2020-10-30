@@ -361,8 +361,9 @@ export default {
   margin: 10px auto;
   background: rgb(255, 255, 255);
   padding: 5px;
-  border-left: 5px rgb(172, 3, 250) solid;
-  border-right: 5px rgb(172, 3, 250) solid;
+  border-left: 5px rgb(250, 94, 3) solid;
+  background-color: rgb(252, 240, 233) ;
+  border-radius: 5px;
 }
 .submitBtn{
   margin-top: 20px;

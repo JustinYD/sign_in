@@ -6,7 +6,10 @@
         "pages/register/main",
         "pages/myself/main",
         "pages/myclass/main",
-        "pages/createclass/main"
+        "pages/createclass/main",
+        "pages/sign_history/main",
+        "pages/item_history/main",
+        "pages/item_detail/main"
     ],
     "window": {
         "backgroundTextStyle": "light",
@@ -65,6 +68,10 @@
         "van-nav-bar": "/static/vant/nav-bar/index",
         "van-field": "/static/vant/field/index",
         "van-picker": "/static/vant/picker/index",
-        "van-search": "/static/vant/search/index"
+        "van-search": "/static/vant/search/index",
+        "van-tag": "/static/vant/tag/index",
+        "van-divider": "/static/vant/divider/index",
+        "van-transition": "/static/vant/transition/index",
+        "ec-canvas": "/static/ec-canvas/ec-canvas"
     }
 }

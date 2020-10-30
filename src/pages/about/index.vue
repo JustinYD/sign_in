@@ -27,7 +27,7 @@
               title="学生考勤记录"
               icon="clock-o"
               link-type="navigateTo"
-              url="../role/main"
+              url="../sign_history/main"
             />
           </div>
           <div class="itemList"> 
@@ -68,7 +68,7 @@
               title="历史考勤记录"
               icon="clock-o"
               link-type="navigateTo"
-              url="../role/main"
+              url="../sign_history/main"
             />
           </div>
           <div class="itemList"> 
@@ -83,6 +83,12 @@
         </van-col>
       </van-row>
     </div>
+    <van-divider
+      contentPosition="center"
+      customStyle="color: lightgrey; border-color: #1989fa; font-size: 12px;margin-top:25%"
+    >
+      Designed By @杨培懂
+    </van-divider>
   </div>
 </template>
 

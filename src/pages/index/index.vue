@@ -16,11 +16,6 @@
         <van-dialog
           id="van-dialog"
         />
-        <img
-          src="/static/tabs/add.png"
-          @click="createStudentClass"
-          class="createBtn"
-        />
         <div
           v-for="item in startStudentClassData"
           :key="item"
@@ -79,7 +74,7 @@
           </h3>
           <h5
             style="color:grey;margin-top:5px"
-          >{{item.status?'开始':'未开始'}}
+          >{{item.status?'打卡中':'未开始'}}
           </h5>
           <h5
             style="color:lightgrey;margin-top:5px"
@@ -98,7 +93,7 @@
           </h3>
           <h5
             style="color:grey;margin-top:5px"
-          >{{item.status?'开始':'未开始'}}
+          >{{item.status?'打卡中':'未开始'}}
           </h5>
           <h5
             style="color:lightgrey;margin-top:5px"
@@ -178,7 +173,7 @@ export default {
       classtemp: {},
       right_width: 65,
       left_width: 65,
-      clearTimeSet:'',
+      clearTimeSet:null,
       startTemp:{},
       distance:''
     }
@@ -283,6 +278,7 @@ export default {
       Dialog.confirm({
             message: '确定开始打卡《'+ data.classname + '》该门课程吗？',
             }).then(() => {
+              this.startTag=''
               this.startFlag=true
             }).catch(()=>{
           })
@@ -525,7 +521,8 @@ export default {
   background: rgb(255, 255, 255);
   padding: 5px;
   border-left: 5px rgb(9, 207, 241) solid;
-  border-right: 5px rgb(9, 207, 241) solid;
+  background-color: #ecf9ff;
+  border-radius: 5px;
 }
 .stopClassList {
   width: 90%;
@@ -533,6 +530,8 @@ export default {
   background: rgb(255, 255, 255);
   padding: 5px;
   border-left: 5px rgb(172, 3, 250) solid;
+  background-color: rgb(245, 232, 252);
+  border-radius: 5px;
 }
 .teacherStartClassList {
   width: 90%;
@@ -540,15 +539,17 @@ export default {
   background: rgb(255, 255, 255);
   padding: 5px;
   border-left: 5px rgb(9, 207, 241) solid;
-  border-right: 5px rgb(9, 207, 241) solid;
+  background-color: #ecf9ff;
+  border-radius: 5px;
 }
 .teacherStopClassList {
   width: 90%;
   margin: 10px auto;
   background: rgb(255, 255, 255);
   padding: 5px;
-  border-left: 5px rgb(172, 3, 250) solid;
-  border-right: 5px rgb(172, 3, 250) solid;
+  border-left: 5px rgb(187, 50, 250) solid;
+  background-color: rgb(250, 243, 253);
+  border-radius: 5px;
 }
 .submitBtn {
   margin-top: 20px;
